@@ -3,12 +3,12 @@ import { useEffect, useState } from "react";
 export default function FileUpload() {
   const [fileName, setFileName] = useState("");
   const [readingFile, setReadingFile] = useState("noFile");
-  const [fileContent, setFileContent] = useState("");
+  const [fileContent, setFileContent] = useState<string | ArrayBuffer>("");
   const [translationFinished, setTranslationFinished] = useState(false);
   const [isTranslating, setIsTranslating] = useState(false);
 
   const [lines, setLines] = useState(0);
-  const [linetranslated, setLineTranslated] = useState(1);
+  const [lineTranslated, setLineTranslated] = useState(1);
 
   const file_upload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
@@ -17,9 +17,12 @@ export default function FileUpload() {
       const file = e.target.files[0];
       if (file) {
         const reader = new FileReader();
-        reader.onload = (e) => {
-          setFileContent(e.target.result);
-          setReadingFile("file_loaded");
+        reader.onload = (readerEvent: ProgressEvent<FileReader>) => {
+          // check if readerEvent is not null - just to fix typescript error
+          if (readerEvent?.target?.result) {
+            setFileContent(readerEvent.target.result);
+            setReadingFile("file_loaded");
+          }
         };
 
         reader.readAsText(file);
@@ -28,9 +31,10 @@ export default function FileUpload() {
   };
 
   const startTranslation = async () => {
-    if (readingFile == "file_loaded") {
+    if (readingFile == "file_loaded" && typeof fileContent === "string") {
       setIsTranslating(true);
       const lines = fileContent.split("\n");
+
       setLines(lines.length);
 
       for (let i = 2; i < lines.length; i++) {
@@ -38,10 +42,12 @@ export default function FileUpload() {
         if (lines[i].length == 0) {
           i += 2;
         } else {
-          const translated: string = await translate(lines[i]);
+          const translated = await translate(lines[i]);
           try {
             lines[i] = translated?.translation.toString();
-          } catch (error) {}
+          } catch (error) {
+            console.log(error);
+          }
         }
       }
 
@@ -90,7 +96,7 @@ export default function FileUpload() {
       link.href = URL.createObjectURL(file);
 
       // Add file name
-      link.download = "translated.vtt";
+      link.download = "translated.srt";
 
       // Add click event to <a> tag to save file.
       link.click();
@@ -148,9 +154,9 @@ export default function FileUpload() {
             >
               <path
                 stroke="currentColor"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
                 d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"
               />
             </svg>
@@ -180,7 +186,7 @@ export default function FileUpload() {
       </p>
 
       <p className={isTranslating ? "text-xl md:text-3xl" : "hidden"} dir="rtl">
-        {linetranslated} دێر وەرگێراوە لە {lines} دێرە
+        {lineTranslated} دێر وەرگێراوە لە {lines} دێرە
       </p>
 
       <p className={translationFinished ? "" : "hidden"}>
