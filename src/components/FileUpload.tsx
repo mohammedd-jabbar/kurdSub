@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useFile } from "../lib/store";
 import DragDrop from "./DragDrop";
+import { translate } from "../lib/hooks";
 
 export default function FileUpload() {
   const {
@@ -15,27 +16,32 @@ export default function FileUpload() {
   const [lines, setLines] = useState(0);
   const [lineTranslated, setLineTranslated] = useState(1);
 
-  const file_upload = (e: File) => {
-    if (e) {
-      setFileStatus("loading");
-      setFileName(e?.name.split(".")[0]);
+  const onUploadFile = (eventTargetFile: File) => {
+    if (eventTargetFile) {
+      setFileStatus("fileIsReady");
+      setFileName(eventTargetFile?.name.split(".")[0]);
 
       const reader = new FileReader();
       reader.onload = (readerEvent: ProgressEvent<FileReader>) => {
         // check if readerEvent is not null - just to fix typescript error
         if (readerEvent?.target?.result) {
           setFileContent(readerEvent.target.result);
-          setFileStatus("loading");
         }
       };
 
-      reader.readAsText(e);
+      reader.readAsText(eventTargetFile);
     }
   };
 
-  const startTranslation = async () => {
-    if (fileStatus == "loading" && typeof fileContent === "string") {
-      setFileStatus("complete");
+  const onRemove = () => {
+    setFileStatus("noFile");
+    setFileName("");
+    setFileContent("");
+  };
+
+  const onTranslate = async () => {
+    if (fileStatus == "fileIsReady" && typeof fileContent === "string") {
+      setFileStatus("loading");
       const lines = fileContent.split("\n");
 
       setLines(lines.length);
@@ -61,34 +67,7 @@ export default function FileUpload() {
     }
   };
 
-  async function translate(line: string) {
-    const result = await fetch(
-      "https://translator-api.glosbe.com/translateByLangWithScore?sourceLang=en&targetLang=ckb",
-      {
-        headers: {
-          accept: "*/*",
-          "accept-language": "en-US,en;q=0.6",
-          "content-type": "text/plain;charset=UTF-8",
-          "sec-ch-ua":
-            '"Not_A Brand";v="8", "Chromium";v="120", "Brave";v="120"',
-          "sec-ch-ua-mobile": "?0",
-          "sec-ch-ua-platform": '"Windows"',
-          "sec-fetch-dest": "empty",
-          "sec-fetch-mode": "cors",
-          "sec-fetch-site": "same-site",
-          "sec-gpc": "1",
-          Referer: "https://glosbe.com/",
-          "Referrer-Policy": "strict-origin-when-cross-origin",
-        },
-        body: line,
-        method: "POST",
-      }
-    );
-    const ready = await result.json();
-    return ready;
-  }
-
-  const downloadFile = () => {
+  const onDownload = () => {
     // Create element with <a> tag
     const link = document.createElement("a");
 
@@ -105,59 +84,53 @@ export default function FileUpload() {
     link.click();
     URL.revokeObjectURL(link.href);
   };
+  console.log(fileContent, fileName, fileStatus);
   return (
-    <div className="flex flex-col gap-5 h-full justify-center items-center">
-      {/* File name */}
-      {fileName && <p>ناوی فایل: {fileName}</p>}
+    <div className="max-w-lg mx-auto p-6 border-4 border-blue-500 rounded-md shadow-lg">
+      {/* File Name */}
 
-      {/* Drag Drop */}
-      <DragDrop onFileSelect={file_upload} />
-
-      {/* Status */}
-      <div>
-        <p className={fileStatus === "complete" ? "hidden" : ""}>
-          {fileStatus == "noFile" ? "هیج فایەلەک دەستنیشان نەکراوە" : ""}
-          {fileStatus == "loading" ? "فایەلەکە وا دەکرێتەوە" : ""}
-          {fileStatus == "complete" ? "فایەلەکە کراوەتەوە" : ""}
-        </p>
-
-        <p
-          className={
-            fileStatus === "complete" ? "text-xl md:text-3xl" : "hidden"
-          }
-          dir="rtl"
-        >
-          {lineTranslated} دێر وەرگێراوە لە {lines} دێرە
-        </p>
-      </div>
-
-      {/* Download */}
-      <button
-        onClick={downloadFile}
-        className="bg-white hover:bg-gray-100 text-gray-800 font-semibold py-2 px-4 border border-gray-400 rounded shadow cursor-pointer disabled:bg-gray-400"
-      >
-        دابەزاندن
-      </button>
-      <p className={fileStatus === "complete" ? "" : "hidden"}>
-        {/* Refresh */}
-        <button
-          onClick={() => window.location.reload()}
-          className="bg-white hover:bg-gray-100 text-gray-800 font-semibold py-2 px-4 border border-gray-400 rounded shadow cursor-pointer disabled:bg-gray-400"
-        >
-          ژێرنووسی تر وەرگێرە
-        </button>
+      <p className="text-lg font-bold mb-4 text-blue-500">
+        ناوی فایل: {fileName || "(بەتاڵ)"}
       </p>
 
-      {/* Translate */}
-      <button
-        onClick={startTranslation}
-        disabled={fileStatus != "loading"}
-        className={
-          "bg-white hover:bg-gray-100 text-gray-800 font-semibold py-2 px-4 border border-gray-400 rounded shadow cursor-pointer disabled:bg-gray-400"
-        }
+      {/* Drag and Drop */}
+      <DragDrop onFileSelect={onUploadFile} />
+
+      {/* Status */}
+      <p
+        className={fileStatus === "complete" ? "text-xl md:text-3xl" : "hidden"}
+        dir="rtl"
       >
-        وەرگێران
-      </button>
+        {lineTranslated} دێر وەرگێراوە لە {lines} دێرە
+      </p>
+
+      <div className="flex items-center justify-start gap-4">
+        {/* Translate Button */}
+        <button
+          onClick={onTranslate}
+          disabled={fileStatus !== "fileIsReady"}
+          className="bg-blue-500 text-white font-semibold py-2 px-4 border border-blue-600 rounded-md shadow-md mr-2 hover:bg-blue-600 transition duration-300 cursor-pointer hover:scale-105 disabled:opacity-70 disabled:hover:scale-100"
+        >
+          Translate
+        </button>
+
+        {/* Download Button */}
+        <button
+          onClick={onDownload}
+          disabled={fileStatus !== "complete"}
+          className="bg-green-500 text-white font-semibold py-2 px-4 border border-green-600 rounded-md shadow-md hover:bg-green-600 transition duration-300 cursor-pointer hover:scale-105 disabled:opacity-70 disabled:hover:scale-100"
+        >
+          Download
+        </button>
+        {/* remove file */}
+        <button
+          onClick={onRemove}
+          disabled={fileStatus !== "complete"}
+          className="bg-red-500 text-white font-semibold py-2 px-4 border border-red-600 rounded-md shadow-md hover:bg-red-600 transition duration-300 cursor-pointer hover:scale-105 disabled:opacity-70 disabled:hover:scale-100"
+        >
+          Remove
+        </button>
+      </div>
     </div>
   );
 }

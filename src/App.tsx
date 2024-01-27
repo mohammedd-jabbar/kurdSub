@@ -5,7 +5,7 @@ import Intro from "./components/Intro";
 
 function App() {
   return (
-    <div>
+    <div className="font-rabar">
       <Container>
         <Intro />
         <FileUpload />

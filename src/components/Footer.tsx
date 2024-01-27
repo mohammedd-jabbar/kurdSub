@@ -2,9 +2,9 @@ const Footer = () => {
   return (
     <footer className="bg-gray-800 text-white p-4 text-center">
       <p className="text-sm">
-        © 2024 Your Project Name. View on{" "}
+        © 2024 KurdSub. View on{" "}
         <a
-          href="https://github.com/your-username/your-project-repo"
+          href="https://github.com/mohammedd-jabbar/kurdSub"
           target="_blank"
           rel="noopener noreferrer"
           className="text-blue-400 hover:underline"

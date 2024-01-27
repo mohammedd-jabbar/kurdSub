@@ -11,4 +11,4 @@ export type TUseFile = {
   setFileContent: (fileContent: string | ArrayBuffer) => void;
 };
 
-export type TFileStatus = "loading" | "complete" | "noFile";
+export type TFileStatus = "fileIsReady" | "loading" | "complete" | "noFile";

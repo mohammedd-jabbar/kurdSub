@@ -4,42 +4,42 @@ import { useFile } from "../lib/store";
 
 export default function DragDrop({ onFileSelect }: any) {
   const { fileStatus } = useFile();
-  const { getRootProps, getInputProps, isDragActive } = useDropzone({
-    accept: {
-      "text/srt": [".srt", ".vtt"],
-    },
-    onDrop: (acceptedFiles) => {
-      const selectedFile = acceptedFiles[0];
-      if (selectedFile) {
-        onFileSelect(selectedFile);
-      }
-    },
+  const { getRootProps, getInputProps, isDragActive, acceptedFiles } =
+    useDropzone({
+      accept: {
+        "text/srt": [".srt", ".vtt"],
+      },
+      onDrop: (acceptedFiles) => {
+        const selectedFile = acceptedFiles[0];
+        if (selectedFile) {
+          onFileSelect(selectedFile);
+        }
+      },
 
-    multiple: false, // Allow only one file
-  });
-
-  // const files = acceptedFiles.map((file) => (
-  //   <li key={file.name}>
-  //     {file.name} - {file.size} bytes
-  //   </li>
-  // ));
+      multiple: false, // Allow only one file
+    });
 
   return (
     <div
       {...getRootProps()}
-      className={`bg-gray-800 text-white border-dashed border-2 border-gray-600 rounded-lg p-8 text-center cursor-pointer ${
-        isDragActive ? "bg-gray-700 border-blue-400" : ""
-      }`}
+      className={`${
+        fileStatus === "fileIsReady"
+          ? "bg-green-100 border-4 border-green-500"
+          : "bg-blue-100 border-dashed border-4 border-blue-500"
+      } rounded-lg p-12 text-center mb-6 cursor-pointer hover:bg-blue-200 transition duration-300`}
     >
       <input {...getInputProps()} />
-      <p className="text-lg">
+      <p
+        className={`text-lg ${
+          fileStatus === "fileIsReady" ? "text-green-800" : "text-blue-800"
+        }`}
+      >
         {isDragActive
-          ? "فایلەکە لێرە دابنێ"
-          : "فایلی وەرگێرانەکەت (سەبتاتیتڵەکەت) ڕابکێشە بۆ ئێرە، یان کلیک بکە بۆ هەڵبژاردنی فایلەکە"}
+          ? "فایلەکە بەربدە"
+          : fileStatus === "fileIsReady"
+          ? `فایلەکە دانراوە: ${acceptedFiles[0].name}`
+          : "فایلی وەرگێرانەکەت (سەبتاتیتڵەکەت) ڕابکێشە بۆ ئێرە، یان کلیک بکە بۆ هەڵبژاردنی فایلەکە لە مۆبایلەکەتەوە"}
       </p>
-      {fileStatus === "complete" ? (
-        <p className="text-xs mt-2 text-gray-500">File uploaded</p>
-      ) : null}
     </div>
   );
 }
