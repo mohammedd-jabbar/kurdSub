@@ -22,7 +22,7 @@ To get started with KurdSub, follow these steps:
 
 #### Clone the repository:
 
-    git clone https://github.com/mohammedd-jabbar/kurdSub
+    git clone https://github.com/mohammedd-jabbar/kurdSub.git
 
 #### Navigate to the project directory:
 
@@ -38,16 +38,17 @@ To get started with KurdSub, follow these steps:
 
 Now you're all set! KurdSub is up and running on your local machine.
 
-
 ## Usage
-* Open the application in your web browser.
-* Upload an English subtitle file (SRT format).
-* KurdSub will translate the subtitles into Kurdish.
+
+- Open the application in your web browser.
+- Upload an English subtitle file (SRT format).
+- KurdSub will translate the subtitles into Kurdish.
 
 ## Dependencies
+
 - Zustand
 - React-Dropzone
 
 ## License
-This project is licensed under the GNU General Public License v3.0.
 
+This project is licensed under the GNU General Public License v3.0.
