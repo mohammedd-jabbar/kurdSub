@@ -22,7 +22,7 @@ To get started with KurdSub, follow these steps:
 
 #### Clone the repository:
 
-    git clone https://github.com/mohammedd-jabbar/kurdSub
+    git clone https://github.com/mohammedd-jabbar/kurdSub.git
 
 #### Navigate to the project directory:
 
