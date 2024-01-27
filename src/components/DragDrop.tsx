@@ -1,7 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useDropzone } from "react-dropzone";
+import { useFile } from "../lib/store";
 
 export default function DragDrop({ onFileSelect }: any) {
+  const { fileStatus } = useFile();
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     accept: {
       "text/srt": [".srt", ".vtt"],
@@ -35,6 +37,9 @@ export default function DragDrop({ onFileSelect }: any) {
           ? "فایلەکە لێرە دابنێ"
           : "فایلی وەرگێرانەکەت (سەبتاتیتڵەکەت) ڕابکێشە بۆ ئێرە، یان کلیک بکە بۆ هەڵبژاردنی فایلەکە"}
       </p>
+      {fileStatus === "complete" ? (
+        <p className="text-xs mt-2 text-gray-500">File uploaded</p>
+      ) : null}
     </div>
   );
 }

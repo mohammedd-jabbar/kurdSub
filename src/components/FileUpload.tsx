@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useFile } from "../lib/store";
 import DragDrop from "./DragDrop";
 
