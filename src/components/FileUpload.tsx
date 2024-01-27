@@ -13,9 +13,12 @@ export default function FileUpload() {
     setFileStatus,
   } = useFile();
 
+  // how many line is the subtitle file
   const [lines, setLines] = useState(0);
+  // how many lines are translated
   const [lineTranslated, setLineTranslated] = useState(0);
 
+  // when file uploaded
   const onUploadFile = (eventTargetFile: File) => {
     if (eventTargetFile) {
       setFileStatus("fileIsReady");
@@ -33,12 +36,14 @@ export default function FileUpload() {
     }
   };
 
+  // handle remove button
   const onRemove = () => {
     setFileStatus("noFile");
     setFileName("");
     setFileContent("");
   };
 
+  // handle translate
   const onTranslate = async () => {
     if (fileStatus == "fileIsReady" && typeof fileContent === "string") {
       setFileStatus("loading");
