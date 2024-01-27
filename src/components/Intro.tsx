@@ -1,6 +1,6 @@
 const Intro = () => {
   return (
-    <div className="bg-gray-500 py-16 text-white mb-16">
+    <div className="bg-slate-600 py-24 text-white mb-16">
       {/* Hero section */}
       <div className="text-center mb-8 md:mb-0">
         <h1 className="text-4xl text-center md:text-6xl font-extrabold mb-6 leading-tight">
