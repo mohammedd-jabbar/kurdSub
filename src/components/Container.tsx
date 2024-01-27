@@ -2,5 +2,9 @@ import { TContainer } from "../lib/types";
 
 // children mean other content in the page
 export default function Container({ children }: TContainer) {
-  return <div className="max-w-[1920px] mx-auto">{children}</div>;
+  return (
+    <div dir="rtl" className="max-w-[1920px] mx-auto text-white mb-20">
+      {children}
+    </div>
+  );
 }

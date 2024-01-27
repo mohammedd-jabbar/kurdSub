@@ -1,12 +1,12 @@
 import Container from "./components/Container";
 import FileUpload from "./components/FileUpload";
+import Intro from "./components/Intro";
 
 function App() {
   return (
     <Container>
-      <div className="flex flex-col md:flex-row  text-white gap-3">
-        <FileUpload />
-      </div>
+      <Intro />
+      <FileUpload />
     </Container>
   );
 }

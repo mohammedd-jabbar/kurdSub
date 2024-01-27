@@ -1,38 +1,41 @@
 import { useEffect, useState } from "react";
+import { useFile } from "../lib/store";
+import DragDrop from "./DragDrop";
 
 export default function FileUpload() {
-  const [fileName, setFileName] = useState("");
-  const [readingFile, setReadingFile] = useState("noFile");
-  const [fileContent, setFileContent] = useState<string | ArrayBuffer>("");
-  const [translationFinished, setTranslationFinished] = useState(false);
-  const [isTranslating, setIsTranslating] = useState(false);
+  const {
+    fileName,
+    fileContent,
+    fileStatus,
+    setFileContent,
+    setFileName,
+    setFileStatus,
+  } = useFile();
 
   const [lines, setLines] = useState(0);
   const [lineTranslated, setLineTranslated] = useState(1);
 
-  const file_upload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files) {
-      setReadingFile("loading");
-      setFileName(e.target.files[0].name.split(".")[0]);
-      const file = e.target.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = (readerEvent: ProgressEvent<FileReader>) => {
-          // check if readerEvent is not null - just to fix typescript error
-          if (readerEvent?.target?.result) {
-            setFileContent(readerEvent.target.result);
-            setReadingFile("file_loaded");
-          }
-        };
+  const file_upload = (e: File) => {
+    if (e) {
+      setFileStatus("loading");
+      setFileName(e?.name.split(".")[0]);
 
-        reader.readAsText(file);
-      }
+      const reader = new FileReader();
+      reader.onload = (readerEvent: ProgressEvent<FileReader>) => {
+        // check if readerEvent is not null - just to fix typescript error
+        if (readerEvent?.target?.result) {
+          setFileContent(readerEvent.target.result);
+          setFileStatus("loading");
+        }
+      };
+
+      reader.readAsText(e);
     }
   };
 
   const startTranslation = async () => {
-    if (readingFile == "file_loaded" && typeof fileContent === "string") {
-      setIsTranslating(true);
+    if (fileStatus == "loading" && typeof fileContent === "string") {
+      setFileStatus("complete");
       const lines = fileContent.split("\n");
 
       setLines(lines.length);
@@ -52,7 +55,7 @@ export default function FileUpload() {
       }
 
       setFileContent(lines.join("\n"));
-      setTranslationFinished(true);
+      setFileStatus("complete");
     } else {
       alert("file not loaded successfully");
     }
@@ -84,26 +87,6 @@ export default function FileUpload() {
     const ready = await result.json();
     return ready;
   }
-  useEffect(() => {
-    if (translationFinished) {
-      // Create element with <a> tag
-      const link = document.createElement("a");
-
-      // Create a blog object with the file content which you want to add to the file
-      const file = new Blob([fileContent], { type: "text/plain" });
-
-      // Add file content in the object URL
-      link.href = URL.createObjectURL(file);
-
-      // Add file name
-      link.download = "translated.srt";
-
-      // Add click event to <a> tag to save file.
-      link.click();
-      URL.revokeObjectURL(link.href);
-      setIsTranslating(false);
-    }
-  }, [fileContent, translationFinished]);
 
   const downloadFile = () => {
     // Create element with <a> tag
@@ -116,80 +99,32 @@ export default function FileUpload() {
     link.href = URL.createObjectURL(file);
 
     // Add file name
-    link.download = "translated.vtt";
+    link.download = "translated.srt";
 
     // Add click event to <a> tag to save file.
     link.click();
     URL.revokeObjectURL(link.href);
   };
   return (
-    <div className="flex flex-col gap-5  h-full  justify-center items-center ps-5 w-screen ">
-      <div className="w-3/3 md:w-1/3">
-        <img src="/headerImage.png" className="size-fit" />
-      </div>
+    <div className="flex flex-col gap-5 h-full justify-center items-center">
+      {fileName && <p>ناوی فایل: {fileName}</p>}
 
-      <h1 className="text-lg md:text-3xl">
-        ژێرنووسی ئنگلیزی لیرە بکە بە کوردی
-      </h1>
-      <p> {fileName} : فایل</p>
+      <DragDrop onFileSelect={file_upload} />
 
-      <div
-        className={
-          isTranslating
-            ? "hidden"
-            : "flex items-center justify-center w-full md:w-1/3"
-        }
-      >
-        <label
-          htmlFor="dropzone-file"
-          className="flex flex-col items-center justify-center w-full h-64 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:hover:bg-bray-800 dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600"
-        >
-          <div className="flex flex-col items-center justify-center pt-5 pb-6">
-            <svg
-              className="w-8 h-8 mb-4 text-gray-500 dark:text-gray-400"
-              aria-hidden="true"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 20 16"
-            >
-              <path
-                stroke="currentColor"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"
-              />
-            </svg>
-            <p className="mb-2 text-sm text-gray-500 dark:text-gray-400">
-              <span className="font-semibold">کلیک بکە بۆ ئەپڵۆد</span> یاخود
-              دراگ و درۆپ بکە
-            </p>
-            <p className="text-xs text-gray-500 dark:text-gray-400">
-              .SRT تەنها
-            </p>
-          </div>
-          <input
-            id="dropzone-file"
-            type="file"
-            className="hidden"
-            onChange={(e) => {
-              file_upload(e);
-            }}
-          />
-        </label>
-      </div>
-
-      <p className={isTranslating ? "hidden" : ""}>
-        {readingFile == "noFile" ? "هیج فایەلەک دەستنیشان نەکراوە" : ""}
-        {readingFile == "loading" ? "فایەلەکە وا دەکرێتەوە" : ""}
-        {readingFile == "file_loaded" ? "فایەلەکە کراوەتەوە" : ""}
+      <p className={fileStatus === "complete" ? "hidden" : ""}>
+        {fileStatus == "noFile" ? "هیج فایەلەک دەستنیشان نەکراوە" : ""}
+        {fileStatus == "loading" ? "فایەلەکە وا دەکرێتەوە" : ""}
+        {fileStatus == "complete" ? "فایەلەکە کراوەتەوە" : ""}
       </p>
 
-      <p className={isTranslating ? "text-xl md:text-3xl" : "hidden"} dir="rtl">
+      <p
+        className={fileStatus === "complete" ? "text-xl md:text-3xl" : "hidden"}
+        dir="rtl"
+      >
         {lineTranslated} دێر وەرگێراوە لە {lines} دێرە
       </p>
 
-      <p className={translationFinished ? "" : "hidden"}>
+      <p className={fileStatus === "complete" ? "" : "hidden"}>
         <button
           onClick={downloadFile}
           className="bg-white hover:bg-gray-100 text-gray-800 font-semibold py-2 px-4 border border-gray-400 rounded shadow cursor-pointer disabled:bg-gray-400"
@@ -209,11 +144,9 @@ export default function FileUpload() {
 
       <button
         onClick={startTranslation}
-        disabled={readingFile != "file_loaded"}
+        disabled={fileStatus != "loading"}
         className={
-          translationFinished
-            ? "hidden"
-            : "bg-white hover:bg-gray-100 text-gray-800 font-semibold py-2 px-4 border border-gray-400 rounded shadow cursor-pointer disabled:bg-gray-400"
+          "bg-white hover:bg-gray-100 text-gray-800 font-semibold py-2 px-4 border border-gray-400 rounded shadow cursor-pointer disabled:bg-gray-400"
         }
       >
         وەرگێران
