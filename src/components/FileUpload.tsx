@@ -14,7 +14,7 @@ export default function FileUpload() {
   } = useFile();
 
   const [lines, setLines] = useState(0);
-  const [lineTranslated, setLineTranslated] = useState(1);
+  const [lineTranslated, setLineTranslated] = useState(0);
 
   const onUploadFile = (eventTargetFile: File) => {
     if (eventTargetFile) {
@@ -46,10 +46,10 @@ export default function FileUpload() {
 
       setLines(lines.length);
 
-      for (let i = 2; i < lines.length; i++) {
-        setLineTranslated(i);
+      for (let i = 1; i < lines.length; i++) {
         if (lines[i].length == 0) {
-          i += 2;
+          setLineTranslated(i);
+          i += 1;
         } else {
           const translated = await translate(lines[i]);
           try {
@@ -63,7 +63,7 @@ export default function FileUpload() {
       setFileContent(lines.join("\n"));
       setFileStatus("complete");
     } else {
-      alert("file not loaded successfully");
+      alert("فایلەکە بە سەرکەوتوویی بارنەکراوە");
     }
   };
 
@@ -84,7 +84,7 @@ export default function FileUpload() {
     link.click();
     URL.revokeObjectURL(link.href);
   };
-  console.log(fileContent, fileName, fileStatus);
+
   return (
     <div className="max-w-lg mx-auto p-6 border-4 border-blue-500 rounded-md shadow-lg">
       {/* File Name */}
@@ -98,37 +98,42 @@ export default function FileUpload() {
 
       {/* Status */}
       <p
-        className={fileStatus === "complete" ? "text-xl md:text-3xl" : "hidden"}
+        className={fileStatus === "loading" ? "text-xl md:text-2xl" : "hidden"}
         dir="rtl"
       >
-        {lineTranslated} دێر وەرگێراوە لە {lines} دێرە
+        {lineTranslated + 1} دێر وەرگێراوە لە کۆی {lines} دێر
       </p>
+      {fileStatus === "complete" && (
+        <p className="text-green-500 my-3">
+          بە سەرکەوتوی وەرگێرانەکە تەواو بوو
+        </p>
+      )}
 
       <div className="flex items-center justify-start gap-4">
         {/* Translate Button */}
         <button
           onClick={onTranslate}
           disabled={fileStatus !== "fileIsReady"}
-          className="bg-blue-500 text-white font-semibold py-2 px-4 border border-blue-600 rounded-md shadow-md mr-2 hover:bg-blue-600 transition duration-300 cursor-pointer hover:scale-105 disabled:opacity-70 disabled:hover:scale-100"
+          className="bg-blue-500 text-white font-semibold py-2 px-4 border border-blue-600 rounded-md shadow-md mr-2 hover:bg-blue-600 transition duration-300 cursor-pointer hover:scale-105 disabled:opacity-50 disabled:hover:bg-blue-500 disabled:hover:scale-100"
         >
-          Translate
+          وەرگێران بکە
         </button>
 
         {/* Download Button */}
         <button
           onClick={onDownload}
           disabled={fileStatus !== "complete"}
-          className="bg-green-500 text-white font-semibold py-2 px-4 border border-green-600 rounded-md shadow-md hover:bg-green-600 transition duration-300 cursor-pointer hover:scale-105 disabled:opacity-70 disabled:hover:scale-100"
+          className="bg-green-500 text-white font-semibold py-2 px-4 border border-green-600 rounded-md shadow-md hover:bg-green-600 transition duration-300 cursor-pointer hover:scale-105 disabled:opacity-50 disabled:hover:bg-blue-500 disabled:hover:scale-100"
         >
-          Download
+          دایببەزێنە
         </button>
         {/* remove file */}
         <button
           onClick={onRemove}
           disabled={fileStatus !== "complete"}
-          className="bg-red-500 text-white font-semibold py-2 px-4 border border-red-600 rounded-md shadow-md hover:bg-red-600 transition duration-300 cursor-pointer hover:scale-105 disabled:opacity-70 disabled:hover:scale-100"
+          className="bg-red-500 text-white font-semibold py-2 px-4 border border-red-600 rounded-md shadow-md hover:bg-red-600 transition duration-300 cursor-pointer hover:scale-105 disabled:opacity-50 disabled:hover:bg-blue-500 disabled:hover:scale-100"
         >
-          Remove
+          بیسڕەوە
         </button>
       </div>
     </div>
