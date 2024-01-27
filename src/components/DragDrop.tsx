@@ -2,7 +2,7 @@
 import { useDropzone } from "react-dropzone";
 
 export default function DragDrop({ onFileSelect }: any) {
-  const { getRootProps, getInputProps } = useDropzone({
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({
     accept: {
       "text/srt": [".srt", ".vtt"],
     },
@@ -25,11 +25,15 @@ export default function DragDrop({ onFileSelect }: any) {
   return (
     <div
       {...getRootProps()}
-      className="border-dashed border-2 border-gray-300 rounded-lg p-8 text-center bg-white text-gray-500"
+      className={`bg-gray-800 text-white border-dashed border-2 border-gray-600 rounded-lg p-8 text-center cursor-pointer ${
+        isDragActive ? "bg-gray-700 border-blue-400" : ""
+      }`}
     >
       <input {...getInputProps()} />
       <p className="text-lg">
-        Click to select a .srt file or drag and drop it here.
+        {isDragActive
+          ? "فایلەکە لێرە دابنێ"
+          : "فایلی وەرگێرانەکەت (سەبتاتیتڵەکەت) ڕابکێشە بۆ ئێرە، یان کلیک بکە بۆ هەڵبژاردنی فایلەکە"}
       </p>
     </div>
   );

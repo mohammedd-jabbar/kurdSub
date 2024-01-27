@@ -107,33 +107,39 @@ export default function FileUpload() {
   };
   return (
     <div className="flex flex-col gap-5 h-full justify-center items-center">
+      {/* File name */}
       {fileName && <p>ناوی فایل: {fileName}</p>}
 
+      {/* Drag Drop */}
       <DragDrop onFileSelect={file_upload} />
 
-      <p className={fileStatus === "complete" ? "hidden" : ""}>
-        {fileStatus == "noFile" ? "هیج فایەلەک دەستنیشان نەکراوە" : ""}
-        {fileStatus == "loading" ? "فایەلەکە وا دەکرێتەوە" : ""}
-        {fileStatus == "complete" ? "فایەلەکە کراوەتەوە" : ""}
-      </p>
+      {/* Status */}
+      <div>
+        <p className={fileStatus === "complete" ? "hidden" : ""}>
+          {fileStatus == "noFile" ? "هیج فایەلەک دەستنیشان نەکراوە" : ""}
+          {fileStatus == "loading" ? "فایەلەکە وا دەکرێتەوە" : ""}
+          {fileStatus == "complete" ? "فایەلەکە کراوەتەوە" : ""}
+        </p>
 
-      <p
-        className={fileStatus === "complete" ? "text-xl md:text-3xl" : "hidden"}
-        dir="rtl"
-      >
-        {lineTranslated} دێر وەرگێراوە لە {lines} دێرە
-      </p>
-
-      <p className={fileStatus === "complete" ? "" : "hidden"}>
-        <button
-          onClick={downloadFile}
-          className="bg-white hover:bg-gray-100 text-gray-800 font-semibold py-2 px-4 border border-gray-400 rounded shadow cursor-pointer disabled:bg-gray-400"
+        <p
+          className={
+            fileStatus === "complete" ? "text-xl md:text-3xl" : "hidden"
+          }
+          dir="rtl"
         >
-          دابەزاندن
-        </button>
-        <br />
-        <br />
+          {lineTranslated} دێر وەرگێراوە لە {lines} دێرە
+        </p>
+      </div>
 
+      {/* Download */}
+      <button
+        onClick={downloadFile}
+        className="bg-white hover:bg-gray-100 text-gray-800 font-semibold py-2 px-4 border border-gray-400 rounded shadow cursor-pointer disabled:bg-gray-400"
+      >
+        دابەزاندن
+      </button>
+      <p className={fileStatus === "complete" ? "" : "hidden"}>
+        {/* Refresh */}
         <button
           onClick={() => window.location.reload()}
           className="bg-white hover:bg-gray-100 text-gray-800 font-semibold py-2 px-4 border border-gray-400 rounded shadow cursor-pointer disabled:bg-gray-400"
@@ -142,6 +148,7 @@ export default function FileUpload() {
         </button>
       </p>
 
+      {/* Translate */}
       <button
         onClick={startTranslation}
         disabled={fileStatus != "loading"}

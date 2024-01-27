@@ -1,13 +1,17 @@
 import Container from "./components/Container";
 import FileUpload from "./components/FileUpload";
+import Footer from "./components/Footer";
 import Intro from "./components/Intro";
 
 function App() {
   return (
-    <Container>
-      <Intro />
-      <FileUpload />
-    </Container>
+    <div>
+      <Container>
+        <Intro />
+        <FileUpload />
+      </Container>
+      <Footer />
+    </div>
   );
 }
 

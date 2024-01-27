@@ -1,4 +1,4 @@
-import create from "zustand";
+import { create } from "zustand";
 import { TFileStatus, TUseFile } from "./types";
 
 export const useFile = create<TUseFile>((set) => ({
